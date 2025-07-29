@@ -39,9 +39,7 @@
             <h5 class="card-title">La qualité au bon prix. Nous sommes situés au grand marché de Pointe-Noire dans la grande galerie.</h5>
           </div>
         </div>
-    <h3 class="mt-5">Localisation</h3>
-    <div id="map"></div>
-
+    
     <h3 class="mt-5">Passer une commande</h3>
     <form id="orderForm">
       <div class="mb-3">
@@ -71,69 +69,63 @@
   <div class="cookie-banner" id="cookieBanner">
     Ce site utilise des cookies pour améliorer votre expérience.
     <button class="btn btn-sm btn-primary ms-2" onclick="acceptCookies()">Accepter</button>
+
+   <button class="btn btn-sm btn-primary ms-2" onclick="refuseCookies()">Refuser</button>
+
   </div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script>
+  // Gestion du formulaire: envoi WhatsApp
+  document.getElementById("orderForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const model = document.getElementById("model").value;
+    const message = document.getElementById("message").value;
 
-    // Chargement de la carte après le chargement de la page
-    window.initMap = initMap;
+    const whatsappMessage = `Bonjour, je suis ${name}. Je souhaite commander le modèle ${model}. ${message}`;
+    // Mets ici ton vrai numéro WhatsApp!
+    const whatsappURL = `https://wa.me/242064380433?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(whatsappURL, "_blank");
+  });
 
-    // Gestion du formulaire
-    document.getElementById("orderForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const model = document.getElementById("model").value;
-      const message = document.getElementById("message").value;
-
-      const whatsappMessage = `Bonjour, je suis name. Je souhaite commander le modèle{model}. message`;
-      const whatsappURL = `https://wa.me/242XXXXXXXXX?text={encodeURIComponent(whatsappMessage)}`;
-      window.open(whatsappURL, "_blank");
-    });
-
-    // Exportation vers Excel
-    document.getElementById("export_button").addEventListener("click", function () {
-      const data = [
-        ["Nom", "Téléphone", "Modèle", "Message"],
-        [
-          document.getElementById("name").value,
-          document.getElementById("phone").value,
-          document.getElementById("model").value,document.getElementById("message").value,
-        ],
-      ];
-      const worksheet = XLSX.utils.aoa_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Commande");
-      XLSX.writeFile(workbook, "commande.xlsx");
-    });
-
-    // Gestion des cookies
-    function acceptCookies() {
-      document.getElementById("cookieBanner").style.display = "none";
-      localStorage.setItem("cookiesAccepted", "true");
+  // Exportation vers Excel
+  document.getElementById("export_button").addEventListener("click", function () {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const model = document.getElementById("model").value;
+    const message = document.getElementById("message").value;
+    if(!name ||!phone ||!model) {
+      alert("Remplis tous les champs avant d’exporter!");
+      return;
     }
+    const data = [
+      ["Nom", "Téléphone", "Modèle", "Message"],
+      [name, phone, model, message]
+    ];
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Commande");
+    XLSX.writeFile(workbook, "commande.xlsx");
+  });
 
-    window.addEventListener("load", function () {
-      if (localStorage.getItem("cookiesAccepted") === "true") {
-        document.getElementById("cookieBanner").style.display = "none";
-      }
-    });
-javascript
-function initMap() {
-  const location = { lat: -4.769162, lng: 11.866362 };
-  const map = new google.maps.Map(document.getElementById("map"), {
-    center: location,
-    zoom: 17,
+  // Gestion des cookies
+  function acceptCookies() {
+    document.getElementById("cookieBanner").style.display = "none";
+    localStorage.setItem("cookiesAccepted", "true");
+  }
+  function refuseCookies() {
+    document.getElementById("cookieBanner").style.display = "none";
+    localStorage.setItem("cookiesAccepted", "false");
+  }
+  window.addEventListener("load", function () {
+    if (localStorage.getItem("cookiesAccepted")!== null) {
+      document.getElementById("cookieBanner").style.display = "none";
+    }
   });
-  new google.maps.Marker({
-    position: location,
-    map: map,
-    title: "Manu Store - Grand Marché de Pointe-Noire",
-  });
-}
-    html
-<!-- API Google Maps -->
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AlzaSyA-UKQYiShOplhyubc3sa&callback=initMap"></script>
+</script>
+```
+
